@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getDeals, getCategoryBySlug, getDealBySlug } from "@/lib/data";
+import RedeemButton from "@/components/RedeemButton";
 
 export async function generateStaticParams() {
   const deals = await getDeals();
@@ -55,9 +56,7 @@ export default async function DealPage({
           <p className="mt-2">Gyldig til: {deal.expires}</p>
         </div>
 
-        <button className="mt-8 w-full rounded-full bg-indigo-600 py-3 text-center text-sm font-semibold text-white hover:bg-indigo-700">
-          Hent tilbud
-        </button>
+        <RedeemButton code={deal.code} websiteUrl={deal.websiteUrl} />
       </div>
     </div>
   );

@@ -17,4 +17,6 @@ export interface Deal {
   terms: string;
   featured?: boolean;
   expires: string;
+  code?: string;
+  websiteUrl?: string;
 }

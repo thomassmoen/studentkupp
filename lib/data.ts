@@ -14,6 +14,8 @@ function mapDeal(row: any): Deal {
     terms: row.terms,
     featured: row.featured,
     expires: row.expires,
+    code: row.code,
+    websiteUrl: row.website_url,
   };
 }
 
