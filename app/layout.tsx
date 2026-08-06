@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "studentkortet.no – Rabatter for studenter",
+  title: "Studentkupp.no – Rabatter for studenter",
   description:
     "Rabatter og studentfordeler fra kjente leverandører, samlet for norske studenter.",
 };

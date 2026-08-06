@@ -12,7 +12,7 @@ export default async function Footer() {
               🎓
             </span>
             <span className="text-base font-bold text-slate-900">
-              studentkortet.no
+              Studentkupp.no
             </span>
           </div>
           <p className="mt-3 max-w-xs text-sm text-slate-500">
@@ -40,14 +40,14 @@ export default async function Footer() {
         <div>
           <h3 className="text-sm font-semibold text-slate-900">Om oss</h3>
           <ul className="mt-3 space-y-2 text-sm text-slate-500">
-            <li>Om studentkortet.no</li>
+            <li>Om Studentkupp.no</li>
             <li>Kontakt oss</li>
             <li>For leverandører</li>
           </ul>
         </div>
       </div>
       <div className="border-t border-black/5 px-4 py-4 text-center text-xs text-slate-400 sm:px-6">
-        © {new Date().getFullYear()} studentkortet.no — Alle rettigheter
+        © {new Date().getFullYear()} Studentkupp.no — Alle rettigheter
         reservert.
       </div>
     </footer>

@@ -11,7 +11,7 @@ export default async function Header() {
             🎓
           </span>
           <span className="text-lg font-bold tracking-tight text-slate-900">
-            studentkortet<span className="text-indigo-600">.no</span>
+            Studentkupp<span className="text-indigo-600">.no</span>
           </span>
         </Link>
 
