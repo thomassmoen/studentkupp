@@ -1,8 +1,9 @@
 import { notFound } from "next/navigation";
-import { categories, getCategoryBySlug, getDealsByCategory } from "@/lib/data";
+import { getCategories, getCategoryBySlug, getDealsByCategory } from "@/lib/data";
 import DealCard from "@/components/DealCard";
 
-export function generateStaticParams() {
+export async function generateStaticParams() {
+  const categories = await getCategories();
   return categories.map((c) => ({ slug: c.slug }));
 }
 
@@ -12,10 +13,10 @@ export default async function CategoryPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const category = getCategoryBySlug(slug);
+  const category = await getCategoryBySlug(slug);
   if (!category) notFound();
 
-  const dealsInCategory = getDealsByCategory(slug);
+  const dealsInCategory = await getDealsByCategory(slug);
 
   return (
     <div>

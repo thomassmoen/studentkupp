@@ -1,8 +1,9 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { deals, getCategoryBySlug, getDealBySlug } from "@/lib/data";
+import { getDeals, getCategoryBySlug, getDealBySlug } from "@/lib/data";
 
-export function generateStaticParams() {
+export async function generateStaticParams() {
+  const deals = await getDeals();
   return deals.map((d) => ({ slug: d.slug }));
 }
 
@@ -12,10 +13,10 @@ export default async function DealPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const deal = getDealBySlug(slug);
+  const deal = await getDealBySlug(slug);
   if (!deal) notFound();
 
-  const category = getCategoryBySlug(deal.category);
+  const category = await getCategoryBySlug(deal.category);
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-14 sm:px-6">

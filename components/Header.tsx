@@ -1,7 +1,8 @@
 import Link from "next/link";
-import { categories } from "@/lib/data";
+import { getCategories } from "@/lib/data";
 
-export default function Header() {
+export default async function Header() {
+  const categories = await getCategories();
   return (
     <header className="sticky top-0 z-50 border-b border-black/5 bg-white/90 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-6 px-4 py-4 sm:px-6">

@@ -1,9 +1,13 @@
-import { categories, deals, getFeaturedDeals } from "@/lib/data";
+import { getCategories, getDeals, getFeaturedDeals } from "@/lib/data";
 import CategoryCard from "@/components/CategoryCard";
 import DealCard from "@/components/DealCard";
 
-export default function Home() {
-  const featured = getFeaturedDeals();
+export default async function Home() {
+  const [categories, deals, featured] = await Promise.all([
+    getCategories(),
+    getDeals(),
+    getFeaturedDeals(),
+  ]);
 
   return (
     <div>
