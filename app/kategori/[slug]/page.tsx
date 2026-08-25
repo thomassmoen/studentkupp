@@ -2,6 +2,8 @@ import { notFound } from "next/navigation";
 import { getCategories, getCategoryBySlug, getDealsByCategory } from "@/lib/data";
 import DealCard from "@/components/DealCard";
 
+export const revalidate = 60;
+
 export async function generateStaticParams() {
   const categories = await getCategories();
   return categories.map((c) => ({ slug: c.slug }));

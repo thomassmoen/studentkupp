@@ -14,6 +14,8 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+export const revalidate = 60;
+
 export const metadata: Metadata = {
   title: "Studentkupp.no – Rabatter for studenter",
   description:

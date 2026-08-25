@@ -3,6 +3,8 @@ import Link from "next/link";
 import { getDeals, getCategoryBySlug, getDealBySlug } from "@/lib/data";
 import RedeemButton from "@/components/RedeemButton";
 
+export const revalidate = 60;
+
 export async function generateStaticParams() {
   const deals = await getDeals();
   return deals.map((d) => ({ slug: d.slug }));
