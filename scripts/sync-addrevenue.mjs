@@ -6,6 +6,7 @@ const supabase = createClient(
 );
 
 const ADDREVENUE_TOKEN = process.env.ADDREVENUE_API_TOKEN;
+const ADDREVENUE_CHANNEL_ID = process.env.ADDREVENUE_CHANNEL_ID;
 const FALLBACK_CATEGORY = "annet";
 
 function slugify(text) {
@@ -37,7 +38,8 @@ async function ensureFallbackCategory() {
 }
 
 async function fetchCampaigns() {
-  const res = await fetch("https://addrevenue.io/api/v2/campaigns", {
+  const url = `https://addrevenue.io/api/v2/campaigns?channelId=${ADDREVENUE_CHANNEL_ID}`;
+  const res = await fetch(url, {
     headers: {
       Authorization: `Bearer ${ADDREVENUE_TOKEN}`,
       "Content-type": "application/json",
@@ -63,7 +65,7 @@ function mapCampaignToDeal(campaign) {
     featured: false,
     expires: formatDate(campaign.validTo),
     code: campaign.discountCode,
-    website_url: campaign.url || campaign.advertiserUrl,
+    website_url: campaign.trackingLink || campaign.url || campaign.advertiserUrl,
   };
 }
 
