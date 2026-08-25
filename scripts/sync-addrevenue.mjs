@@ -67,6 +67,13 @@ function mapCampaignToDeal(campaign) {
   };
 }
 
+function isNorwayFocused(campaign) {
+  const domain = (campaign.advertiserUrl || "").toLowerCase();
+  const isNoDomain = domain.includes(".no/") || domain.endsWith(".no");
+  const isNarrowMarket = (campaign.markets?.length ?? 0) <= 5;
+  return isNoDomain || isNarrowMarket;
+}
+
 async function main() {
   await ensureFallbackCategory();
 
@@ -76,12 +83,20 @@ async function main() {
       c.markets?.includes("NO") &&
       c.status === "active" &&
       c.type === "coupon" &&
-      c.discountCode
+      c.discountCode &&
+      isNorwayFocused(c)
   );
 
-  console.log(`Found ${norwegian.length} active Norwegian coupons.`);
+  console.log(`Found ${norwegian.length} genuinely Norway-focused coupons.`);
 
   const deals = norwegian.map(mapCampaignToDeal);
+
+  // Remove previously synced Addrevenue deals that no longer qualify
+  const { error: deleteError } = await supabase
+    .from("deals")
+    .delete()
+    .like("id", "ar-%");
+  if (deleteError) throw deleteError;
 
   const { error } = await supabase
     .from("deals")
