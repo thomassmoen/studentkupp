@@ -50,6 +50,23 @@ async function fetchCampaigns() {
   return data.results ?? [];
 }
 
+function extractDiscountLabel(campaign) {
+  const text = `${campaign.description || ""} ${campaign.terms || ""}`;
+
+  const percentMatch = text.match(/\d{1,3}\s?%/);
+  if (percentMatch) return percentMatch[0].replace(/\s+/, "");
+
+  const forMatch = text.match(/(\d+)\s*(?:for|på)\s*(\d+)/i);
+  if (forMatch) return `${forMatch[1]} for ${forMatch[2]}`;
+
+  const amountMatch = text.match(/\d+\s?(?:kr|nok|€|\$)/i);
+  if (amountMatch) return amountMatch[0];
+
+  if (/gratis frakt|free shipping|frifrakt/i.test(text)) return "Gratis frakt";
+
+  return "Rabatt";
+}
+
 function mapCampaignToDeal(campaign) {
   const slug = slugify(`${campaign.advertiserName}-${campaign.id}`);
   return {
@@ -59,7 +76,7 @@ function mapCampaignToDeal(campaign) {
     brand: campaign.advertiserName,
     brand_color: "bg-slate-700",
     category: FALLBACK_CATEGORY,
-    discount: campaign.discountCode,
+    discount: extractDiscountLabel(campaign),
     description: `Hos ${campaign.advertiserName}: ${campaign.description}`,
     terms: campaign.terms || "Se vilkår hos butikken.",
     featured: false,
