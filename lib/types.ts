@@ -11,6 +11,7 @@ export interface Deal {
   title: string;
   brand: string;
   brandColor: string;
+  logoUrl?: string;
   category: string;
   discount: string;
   description: string;

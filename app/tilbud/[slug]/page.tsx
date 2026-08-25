@@ -34,11 +34,19 @@ export default async function DealPage({
 
       <div className="mt-6 rounded-2xl border border-slate-100 bg-white p-8 shadow-sm">
         <div className="flex items-center justify-between">
-          <div
-            className={`grid h-16 w-16 place-items-center rounded-2xl text-lg font-bold text-white ${deal.brandColor}`}
-          >
-            {deal.brand.slice(0, 2).toUpperCase()}
-          </div>
+          {deal.logoUrl ? (
+            <img
+              src={deal.logoUrl}
+              alt={deal.brand}
+              className="h-16 w-16 rounded-2xl object-contain bg-white ring-1 ring-slate-100"
+            />
+          ) : (
+            <div
+              className={`grid h-16 w-16 place-items-center rounded-2xl text-lg font-bold text-white ${deal.brandColor}`}
+            >
+              {deal.brand.slice(0, 2).toUpperCase()}
+            </div>
+          )}
           <span className="rounded-full bg-indigo-50 px-4 py-1.5 text-sm font-semibold text-indigo-700">
             {deal.discount}
           </span>

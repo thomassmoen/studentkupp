@@ -8,11 +8,19 @@ export default function DealCard({ deal }: { deal: Deal }) {
       className="group flex flex-col rounded-2xl border border-slate-100 bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
     >
       <div className="flex items-center justify-between">
-        <div
-          className={`grid h-11 w-11 place-items-center rounded-xl text-sm font-bold text-white ${deal.brandColor}`}
-        >
-          {deal.brand.slice(0, 2).toUpperCase()}
-        </div>
+        {deal.logoUrl ? (
+          <img
+            src={deal.logoUrl}
+            alt={deal.brand}
+            className="h-11 w-11 rounded-xl object-contain bg-white ring-1 ring-slate-100"
+          />
+        ) : (
+          <div
+            className={`grid h-11 w-11 place-items-center rounded-xl text-sm font-bold text-white ${deal.brandColor}`}
+          >
+            {deal.brand.slice(0, 2).toUpperCase()}
+          </div>
+        )}
         <span className="rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-700">
           {deal.discount}
         </span>

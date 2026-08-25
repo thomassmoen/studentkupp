@@ -8,6 +8,7 @@ function mapDeal(row: any): Deal {
     title: row.title,
     brand: row.brand,
     brandColor: row.brand_color,
+    logoUrl: row.logo_url,
     category: row.category,
     discount: row.discount,
     description: row.description,

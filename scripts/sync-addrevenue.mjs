@@ -50,6 +50,23 @@ async function fetchCampaigns() {
   return data.results ?? [];
 }
 
+async function fetchAdvertiserLogos() {
+  const res = await fetch("https://addrevenue.io/api/v2/advertisers", {
+    headers: {
+      Authorization: `Bearer ${ADDREVENUE_TOKEN}`,
+      "Content-type": "application/json",
+    },
+  });
+  if (!res.ok) throw new Error(`Addrevenue API error: ${res.status}`);
+  const data = await res.json();
+  const advertisers = data.results ?? data ?? [];
+  const logos = {};
+  for (const a of advertisers) {
+    if (a.logoImageFilename) logos[a.id] = a.logoImageFilename;
+  }
+  return logos;
+}
+
 function extractDiscountLabel(campaign) {
   const text = `${campaign.description || ""} ${campaign.terms || ""}`;
 
@@ -67,7 +84,7 @@ function extractDiscountLabel(campaign) {
   return "Rabatt";
 }
 
-function mapCampaignToDeal(campaign) {
+function mapCampaignToDeal(campaign, logos) {
   const slug = slugify(`${campaign.advertiserName}-${campaign.id}`);
   return {
     id: `ar-${campaign.id}`,
@@ -75,6 +92,7 @@ function mapCampaignToDeal(campaign) {
     title: campaign.description,
     brand: campaign.advertiserName,
     brand_color: "bg-slate-700",
+    logo_url: logos[campaign.advertiserId],
     category: FALLBACK_CATEGORY,
     discount: extractDiscountLabel(campaign),
     description: `Hos ${campaign.advertiserName}: ${campaign.description}`,
@@ -96,7 +114,10 @@ function isNorwayFocused(campaign) {
 async function main() {
   await ensureFallbackCategory();
 
-  const campaigns = await fetchCampaigns();
+  const [campaigns, logos] = await Promise.all([
+    fetchCampaigns(),
+    fetchAdvertiserLogos(),
+  ]);
   const norwegian = campaigns.filter(
     (c) =>
       c.markets?.includes("NO") &&
@@ -108,7 +129,7 @@ async function main() {
 
   console.log(`Found ${norwegian.length} genuinely Norway-focused coupons.`);
 
-  const deals = norwegian.map(mapCampaignToDeal);
+  const deals = norwegian.map((c) => mapCampaignToDeal(c, logos));
 
   // Remove previously synced Addrevenue deals that no longer qualify
   const { error: deleteError } = await supabase
