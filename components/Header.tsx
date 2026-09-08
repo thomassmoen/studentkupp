@@ -26,19 +26,6 @@ export default async function Header() {
             </Link>
           ))}
         </nav>
-
-        <form
-          action="/sok"
-          className="hidden max-w-xs flex-1 items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-4 py-2 sm:flex"
-        >
-          <span className="text-slate-400">🔍</span>
-          <input
-            type="text"
-            name="q"
-            placeholder="Søk etter tilbud..."
-            className="w-full bg-transparent text-sm outline-none placeholder:text-slate-400"
-          />
-        </form>
       </div>
     </header>
   );
