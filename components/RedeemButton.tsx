@@ -19,7 +19,7 @@ export default function RedeemButton({
     setTimeout(() => setCopied(false), 2000);
   }
 
-  if (!code || !websiteUrl) {
+  if (!websiteUrl) {
     return (
       <button
         disabled
@@ -56,18 +56,22 @@ export default function RedeemButton({
               ✕
             </button>
 
-            <p className="text-sm text-slate-500">Din rabattkode</p>
-            <div className="mt-3 flex items-center justify-center gap-2 rounded-xl border border-dashed border-indigo-300 bg-indigo-50 px-4 py-3">
-              <span className="text-lg font-bold tracking-wide text-indigo-700">
-                {code}
-              </span>
-              <button
-                onClick={handleCopy}
-                className="rounded-full bg-indigo-600 px-3 py-1 text-xs font-semibold text-white hover:bg-indigo-700"
-              >
-                {copied ? "Kopiert!" : "Kopier"}
-              </button>
-            </div>
+            {code && (
+              <>
+                <p className="text-sm text-slate-500">Din rabattkode</p>
+                <div className="mt-3 flex items-center justify-center gap-2 rounded-xl border border-dashed border-indigo-300 bg-indigo-50 px-4 py-3">
+                  <span className="text-lg font-bold tracking-wide text-indigo-700">
+                    {code}
+                  </span>
+                  <button
+                    onClick={handleCopy}
+                    className="rounded-full bg-indigo-600 px-3 py-1 text-xs font-semibold text-white hover:bg-indigo-700"
+                  >
+                    {copied ? "Kopiert!" : "Kopier"}
+                  </button>
+                </div>
+              </>
+            )}
 
             <a
               href={websiteUrl}

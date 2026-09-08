@@ -111,8 +111,15 @@ function isNorwayFocused(campaign) {
   return isNoDomain || isNarrowMarket;
 }
 
+function parseLimitArg() {
+  const arg = process.argv.find((a) => a.startsWith("--limit="));
+  return arg ? parseInt(arg.split("=")[1], 10) : null;
+}
+
 async function main() {
   await ensureFallbackCategory();
+
+  const limit = parseLimitArg();
 
   const [campaigns, logos] = await Promise.all([
     fetchCampaigns(),
@@ -129,14 +136,32 @@ async function main() {
 
   console.log(`Found ${norwegian.length} genuinely Norway-focused coupons.`);
 
-  const deals = norwegian.map((c) => mapCampaignToDeal(c, logos));
+  let deals = norwegian.map((c) => mapCampaignToDeal(c, logos));
 
-  // Remove previously synced Addrevenue deals that no longer qualify
-  const { error: deleteError } = await supabase
-    .from("deals")
-    .delete()
-    .like("id", "ar-%");
-  if (deleteError) throw deleteError;
+  if (limit) {
+    const { data: existing, error: existingError } = await supabase
+      .from("deals")
+      .select("id")
+      .like("id", "ar-%");
+    if (existingError) throw existingError;
+
+    const existingIds = new Set((existing ?? []).map((d) => d.id));
+    deals = deals.filter((d) => !existingIds.has(d.id)).slice(0, limit);
+
+    console.log(`Adding ${deals.length} new deals (limit ${limit}, no deletions).`);
+  } else {
+    // Remove previously synced Addrevenue deals that no longer qualify
+    const { error: deleteError } = await supabase
+      .from("deals")
+      .delete()
+      .like("id", "ar-%");
+    if (deleteError) throw deleteError;
+  }
+
+  if (deals.length === 0) {
+    console.log("Nothing to sync.");
+    return;
+  }
 
   const { error } = await supabase
     .from("deals")
