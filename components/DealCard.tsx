@@ -22,7 +22,7 @@ export default function DealCard({ deal }: { deal: Deal }) {
           </div>
         )}
         <span className="rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-700">
-          {deal.discount}
+          {deal.code ? `Rabattkode ${deal.discount}` : deal.discount}
         </span>
       </div>
       <p className="mt-4 text-xs font-medium uppercase tracking-wide text-slate-400">

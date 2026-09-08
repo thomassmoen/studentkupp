@@ -48,7 +48,7 @@ export default async function DealPage({
             </div>
           )}
           <span className="rounded-full bg-indigo-50 px-4 py-1.5 text-sm font-semibold text-indigo-700">
-            {deal.discount}
+            {deal.code ? `Rabattkode ${deal.discount}` : deal.discount}
           </span>
         </div>
 
