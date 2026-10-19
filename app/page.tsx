@@ -1,15 +1,23 @@
-import { getCategories, getDeals, getFeaturedDeals } from "@/lib/data";
-import CategoryCard from "@/components/CategoryCard";
-import DealCard from "@/components/DealCard";
+import { getCategories, getDeals } from "@/lib/data";
+import DealCarousel from "@/components/DealCarousel";
 
 export const revalidate = 60;
 
+function sortNewestFirst(deals: Awaited<ReturnType<typeof getDeals>>) {
+  return [...deals].sort((a, b) => {
+    const numA = parseInt(a.id.replace(/\D/g, ""), 10) || 0;
+    const numB = parseInt(b.id.replace(/\D/g, ""), 10) || 0;
+    return numB - numA;
+  });
+}
+
 export default async function Home() {
-  const [categories, deals, featured] = await Promise.all([
+  const [categories, deals] = await Promise.all([
     getCategories(),
     getDeals(),
-    getFeaturedDeals(),
   ]);
+
+  const newest = sortNewestFirst(deals).slice(0, 12);
 
   return (
     <div>
@@ -46,32 +54,22 @@ export default async function Home() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-4 pt-14 sm:px-6">
-        <h2 className="text-xl font-bold text-slate-900">Populære tilbud</h2>
-        <div className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-3">
-          {featured.map((d) => (
-            <DealCard key={d.id} deal={d} />
-          ))}
-        </div>
-      </section>
+      <div className="pb-10 pt-4">
+        <DealCarousel title="Nye studentrabatter" emoji="🆕" deals={newest} />
 
-      <section className="mx-auto max-w-6xl px-4 pb-14 sm:px-6">
-        <h2 className="text-xl font-bold text-slate-900">Alle tilbud</h2>
-        <div className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-3">
-          {deals.map((d) => (
-            <DealCard key={d.id} deal={d} />
-          ))}
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-6xl px-4 pb-20 sm:px-6">
-        <h2 className="text-xl font-bold text-slate-900">Kategorier</h2>
-        <div className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-6">
-          {categories.map((c) => (
-            <CategoryCard key={c.slug} category={c} />
-          ))}
-        </div>
-      </section>
+        {categories.map((c) => {
+          const categoryDeals = deals.filter((d) => d.category === c.slug);
+          return (
+            <DealCarousel
+              key={c.slug}
+              title={c.name}
+              emoji={c.emoji}
+              deals={categoryDeals}
+              viewAllHref={`/kategori/${c.slug}`}
+            />
+          );
+        })}
+      </div>
     </div>
   );
 }

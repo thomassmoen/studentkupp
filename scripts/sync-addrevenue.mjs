@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { categorizeDeal } from "./categorize.mjs";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -93,7 +94,10 @@ function mapCampaignToDeal(campaign, logos) {
     brand: campaign.advertiserName,
     brand_color: "bg-slate-700",
     logo_url: logos[campaign.advertiserId],
-    category: FALLBACK_CATEGORY,
+    category: categorizeDeal(
+      campaign.advertiserName,
+      `${campaign.description || ""} ${campaign.terms || ""}`
+    ),
     discount: extractDiscountLabel(campaign),
     description: `Hos ${campaign.advertiserName}: ${campaign.description}`,
     terms: campaign.terms || "Se vilkår hos butikken.",
