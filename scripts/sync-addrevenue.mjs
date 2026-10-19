@@ -104,13 +104,6 @@ function mapCampaignToDeal(campaign, logos) {
   };
 }
 
-function isNorwayFocused(campaign) {
-  const domain = (campaign.advertiserUrl || "").toLowerCase();
-  const isNoDomain = domain.includes(".no/") || domain.endsWith(".no");
-  const isNarrowMarket = (campaign.markets?.length ?? 0) <= 5;
-  return isNoDomain || isNarrowMarket;
-}
-
 function parseLimitArg() {
   const arg = process.argv.find((a) => a.startsWith("--limit="));
   return arg ? parseInt(arg.split("=")[1], 10) : null;
@@ -130,8 +123,7 @@ async function main() {
       c.markets?.includes("NO") &&
       c.status === "active" &&
       c.type === "coupon" &&
-      c.discountCode &&
-      isNorwayFocused(c)
+      c.discountCode
   );
 
   console.log(`Found ${norwegian.length} genuinely Norway-focused coupons.`);
