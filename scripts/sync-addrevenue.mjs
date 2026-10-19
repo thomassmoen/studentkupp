@@ -10,6 +10,15 @@ const ADDREVENUE_TOKEN = process.env.ADDREVENUE_API_TOKEN;
 const ADDREVENUE_CHANNEL_ID = process.env.ADDREVENUE_CHANNEL_ID;
 const FALLBACK_CATEGORY = "annet";
 
+// Dropshipping/reseller hubs that flood the catalog with irrelevant, low-trust
+// listings (e.g. Gshopper, a Hong Kong phone reseller with 70+ near-duplicate
+// campaigns). Not real "kjente leverandører" for Norwegian students.
+const JUNK_ADVERTISER_COUNTRIES = new Set(["HK", "CN"]);
+
+// Individually identified low-quality/legally risky advertisers (e.g. replica
+// "designer" goods) that slip through the country filter.
+const BLOCKED_ADVERTISER_NAMES = new Set(["Fidelity Store"]);
+
 function slugify(text) {
   return text
     .toLowerCase()
@@ -51,7 +60,7 @@ async function fetchCampaigns() {
   return data.results ?? [];
 }
 
-async function fetchAdvertiserLogos() {
+async function fetchAdvertisers() {
   const res = await fetch("https://addrevenue.io/api/v2/advertisers", {
     headers: {
       Authorization: `Bearer ${ADDREVENUE_TOKEN}`,
@@ -60,12 +69,7 @@ async function fetchAdvertiserLogos() {
   });
   if (!res.ok) throw new Error(`Addrevenue API error: ${res.status}`);
   const data = await res.json();
-  const advertisers = data.results ?? data ?? [];
-  const logos = {};
-  for (const a of advertisers) {
-    if (a.logoImageFilename) logos[a.id] = a.logoImageFilename;
-  }
-  return logos;
+  return data.results ?? data ?? [];
 }
 
 function extractDiscountLabel(campaign) {
@@ -118,10 +122,17 @@ async function main() {
 
   const limit = parseLimitArg();
 
-  const [campaigns, logos] = await Promise.all([
+  const [campaigns, advertisers] = await Promise.all([
     fetchCampaigns(),
-    fetchAdvertiserLogos(),
+    fetchAdvertisers(),
   ]);
+  const advertiserById = Object.fromEntries(advertisers.map((a) => [a.id, a]));
+  const logos = Object.fromEntries(
+    advertisers
+      .filter((a) => a.logoImageFilename)
+      .map((a) => [a.id, a.logoImageFilename])
+  );
+
   const norwegian = campaigns.filter(
     (c) =>
       c.markets?.includes("NO") &&
@@ -130,9 +141,19 @@ async function main() {
       c.discountCode
   );
 
-  console.log(`Found ${norwegian.length} genuinely Norway-focused coupons.`);
+  const quality = norwegian.filter((c) => {
+    const advertiser = advertiserById[c.advertiserId];
+    if (!advertiser) return false;
+    if (JUNK_ADVERTISER_COUNTRIES.has(advertiser.country)) return false;
+    if (BLOCKED_ADVERTISER_NAMES.has(c.advertiserName)) return false;
+    return true;
+  });
 
-  let deals = norwegian.map((c) => mapCampaignToDeal(c, logos));
+  console.log(
+    `Found ${norwegian.length} Norway-focused coupons, ${quality.length} after removing low-quality advertisers.`
+  );
+
+  let deals = quality.map((c) => mapCampaignToDeal(c, logos));
 
   if (limit) {
     const { data: existing, error: existingError } = await supabase
